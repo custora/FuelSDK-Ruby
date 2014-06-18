@@ -15,54 +15,54 @@ module FuelSDK
       module CUD #create, update, delete
         def post
           if self.respond_to?('folder_property') && !self.folder_id.nil?
-			properties[self.folder_property]  = self.folder_id
-		  elsif self.respond_to?('folder_property') && !self.folder_property.nil? && !client.package_name.nil? then 
-			  if client.package_folders.nil? then
-				  getPackageFolder = ET_Folder.new
-				  getPackageFolder.authStub = client
-				  getPackageFolder.properties = ["ID", "ContentType"]
-				  getPackageFolder.filter = {"Property" => "Name", "SimpleOperator" => "equals", "Value" => client.package_name}
-				  resultPackageFolder = getPackageFolder.get
-				  if resultPackageFolder.status then 
-					  client.package_folders = {}
-					  resultPackageFolder.results.each do |value|
-						  client.package_folders[value[:content_type]] = value[:id]
-					  end
-				  else
-					  raise "Unable to retrieve folders from account due to: #{resultPackageFolder.message}"
-				  end 
-			  end 
-			  
-			  if !client.package_folders.has_key?(self.folder_media_type) then  
-				  if client.parentFolders.nil? then
-					  parentFolders = ET_Folder.new
-					  parentFolders.authStub = client
-					  parentFolders.properties = ["ID", "ContentType"]
-					  parentFolders.filter = {"Property" => "ParentFolder.ID", "SimpleOperator" => "equals", "Value" => "0"}
-					  resultParentFolders = parentFolders.get
-					  if resultParentFolders.status then 
-						  client.parent_folders = {}
-						  resultParentFolders.results.each do |value|
-							  client.parent_folders[value[:content_type]] = value[:id]
-						  end
-					  else
-						  raise "Unable to retrieve folders from account due to: #{resultParentFolders.message}"
-					  end
-				  end
-				  
-				  newFolder = ET_Folder.new
-				  newFolder.authStub = client
-				  newFolder.properties = {"Name" => client.package_name, "Description" => client.package_name, "ContentType"=> self.folder_media_type, "IsEditable"=>"true", "ParentFolder" => {"ID" => client.parentFolders[self.folder_media_type]}}
-				  folderResult = newFolder.post
-				  if folderResult.status then
-					  client.package_folders[self.folder_media_type]  = folderResult.results[0][:new_id]
-				  else 
-					  raise "Unable to create folder for Post due to: #{folderResult.message}"
-				  end 
-				  
-			  end 			
-			  properties[self.folder_property] = client.package_folders[self.folder_media_type]
-		  end
+    	   		properties[self.folder_property]  = self.folder_id
+    		  elsif self.respond_to?('folder_property') && !self.folder_property.nil? && !client.package_name.nil? then
+    			  if client.package_folders.nil? then
+    				  getPackageFolder = ET_Folder.new
+    				  getPackageFolder.authStub = client
+    				  getPackageFolder.properties = ["ID", "ContentType"]
+    				  getPackageFolder.filter = {"Property" => "Name", "SimpleOperator" => "equals", "Value" => client.package_name}
+    				  resultPackageFolder = getPackageFolder.get
+    				  if resultPackageFolder.status then
+    					  client.package_folders = {}
+    					  resultPackageFolder.results.each do |value|
+    						  client.package_folders[value[:content_type]] = value[:id]
+    					  end
+    				  else
+    					  raise "Unable to retrieve folders from account due to: #{resultPackageFolder.message}"
+    				  end
+    			  end
+
+    			  if !client.package_folders.has_key?(self.folder_media_type) then
+    				  if client.parentFolders.nil? then
+    					  parentFolders = ET_Folder.new
+    					  parentFolders.authStub = client
+    					  parentFolders.properties = ["ID", "ContentType"]
+    					  parentFolders.filter = {"Property" => "ParentFolder.ID", "SimpleOperator" => "equals", "Value" => "0"}
+    					  resultParentFolders = parentFolders.get
+    					  if resultParentFolders.status then
+    						  client.parent_folders = {}
+    						  resultParentFolders.results.each do |value|
+    							  client.parent_folders[value[:content_type]] = value[:id]
+    						  end
+    					  else
+    						  raise "Unable to retrieve folders from account due to: #{resultParentFolders.message}"
+    					  end
+    				  end
+
+    				  newFolder = ET_Folder.new
+    				  newFolder.authStub = client
+    				  newFolder.properties = {"Name" => client.package_name, "Description" => client.package_name, "ContentType"=> self.folder_media_type, "IsEditable"=>"true", "ParentFolder" => {"ID" => client.parentFolders[self.folder_media_type]}}
+    				  folderResult = newFolder.post
+    				  if folderResult.status then
+    					  client.package_folders[self.folder_media_type]  = folderResult.results[0][:new_id]
+    				  else
+    					  raise "Unable to create folder for Post due to: #{folderResult.message}"
+    				  end
+
+    			  end
+    			  properties[self.folder_property] = client.package_folders[self.folder_media_type]
+    		  end
           client.soap_post id, properties
         end
 
@@ -106,11 +106,7 @@ module FuelSDK
       alias authStub= client= # backward compatibility
 
       def properties
-         if @properties.kind_of? Array
-            @properties           
-         else
-            [@properties].compact
-         end 
+         @properties
       end
 
       def id
@@ -223,7 +219,7 @@ module FuelSDK
     end
   
     def post
-      originalProp = properties        
+      originalProp = self.properties
       cleanProps
       obj = super
       properties = originalProp
@@ -234,7 +230,7 @@ module FuelSDK
       originalProp = properties        
       cleanProps
       obj = super
-      properties = originalProp
+      self.properties = originalProp
       return obj
     end    
     
@@ -255,10 +251,10 @@ module FuelSDK
     
     def cleanProps
         # If the ID property is specified for the destination then it must be a list import
-        if properties.has_key?('DestinationObject') then
-            if properties['DestinationObject'].has_key?('ID') then
-                properties[:attributes!] = { 'DestinationObject' => { 'xsi:type' => 'tns:List'}} 
-            end 
+        if self.properties.has_key?('DestinationObject') then
+            if self.properties['DestinationObject'].has_key?('ID') then
+                self.properties[:attributes!] = { 'DestinationObject' => { 'xsi:type' => 'tns:List'}}
+            end
         end 
     end 
   end
