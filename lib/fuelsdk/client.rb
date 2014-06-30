@@ -40,7 +40,7 @@ module FuelSDK
 
 	class Client
 	attr_accessor :debug, :access_token, :auth_token, :internal_token, :refresh_token,
-		:id, :secret, :signature, :package_name, :package_folders, :parent_folders, :auth_token_expiration
+		:id, :secret, :signature, :package_name, :package_folders, :parent_folders, :auth_token_expiration, :mailer
 
 	include FuelSDK::Soap
 	include FuelSDK::Rest
@@ -64,6 +64,8 @@ module FuelSDK
 			self.secret = client_config["secret"]
 			self.signature = client_config["signature"]
 			end
+
+			self.mailer = params['mailer'] if params['mailer']
 
 			self.jwt = params['jwt'] if params['jwt']
 			self.refresh_token = params['refresh_token'] if params['refresh_token']
@@ -94,6 +96,10 @@ module FuelSDK
 			self.internal_token = response['legacyToken']
 			self.auth_token_expiration = Time.new + response['expiresIn']
 			self.refresh_token = response['refreshToken'] if response.has_key?("refreshToken")
+			if self.mailer
+				self.mailer.refresh_token = self.refresh_token
+				self.mailer.save
+			end
 			return true
 			else 
 			return false
