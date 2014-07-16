@@ -544,6 +544,8 @@ module FuelSDK
       raise 'Unable to handle muliple DataExtension definitions and a field definition'
       end
 
+      d = [d] if d.kind_of?(Hash)
+
       d.each do |de|
 
         if (explicit_fields(de) and (de['columns'] || de['fields'] || has_fields)) or
