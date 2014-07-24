@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rspec>, [">= 0"])
       s.add_development_dependency(%q<guard>, [">= 0"])
       s.add_development_dependency(%q<guard-rspec>, [">= 0"])
-      s.add_runtime_dependency(%q<savon>, ["~> 2.2"])
+      s.add_runtime_dependency(%q<savon>, ["~> 2.3"])
       s.add_runtime_dependency(%q<json>, ["~> 1.7"])
       s.add_runtime_dependency(%q<jwt>, ["~> 0.1.6"])
     else
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rspec>, [">= 0"])
       s.add_dependency(%q<guard>, [">= 0"])
       s.add_dependency(%q<guard-rspec>, [">= 0"])
-      s.add_dependency(%q<savon>, ["~> 2.2"])
+      s.add_dependency(%q<savon>, ["~> 2.3"])
       s.add_dependency(%q<json>, ["~> 1.7"])
       s.add_dependency(%q<jwt>, ["~> 0.1.6"])
     end
@@ -45,7 +45,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<rspec>, [">= 0"])
     s.add_dependency(%q<guard>, [">= 0"])
     s.add_dependency(%q<guard-rspec>, [">= 0"])
-    s.add_dependency(%q<savon>, ["~> 2.2"])
+    s.add_dependency(%q<savon>, ["~> 2.3"])
     s.add_dependency(%q<json>, ["~> 1.7"])
     s.add_dependency(%q<jwt>, ["~> 0.1.6"])
   end

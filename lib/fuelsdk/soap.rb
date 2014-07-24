@@ -85,8 +85,10 @@ module FuelSDK
     def header
       raise 'Require legacy token for soap header' unless internal_token
       {
-        'oAuth' => {'oAuthToken' => internal_token},
-        :attributes! => { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}
+        'oAuth' => {
+          'oAuthToken' => internal_token,
+          'xmlns' => 'http://exacttarget.com'
+        }
       }
     end
 
@@ -126,8 +128,10 @@ module FuelSDK
     def soap_perform object_type, action, properties
       message = {}
       message['Action'] = action
+      properties.each do |property|
+        property['@xsi:type'] = "tns:#{object_type}"
+      end
       message['Definitions'] = {'Definition' => properties}
-      message['Definitions'][:attributes!] = { 'Definition' => { 'xsi:type' => ('tns:' + object_type) }}
 
       soap_request :perform, message
     end
@@ -139,11 +143,11 @@ module FuelSDK
      message['Configurations'] = {}
 
      message['Configurations']['Configuration'] = []
+
      properties.each do |configItem|
+       configItem['@xsi:type'] = "tns:#{object_type}"
        message['Configurations']['Configuration'] << configItem
      end
-
-     message['Configurations'][:attributes!] = { 'Configuration' => { 'xsi:type' => ('tns:' + object_type) }}
      
      soap_request :configure, message
     end
@@ -166,14 +170,14 @@ module FuelSDK
       message = {'ObjectType' => object_type, 'Properties' => properties}
 
       if filter and filter.kind_of? Hash
-        message['Filter'] = filter
-        message[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:SimpleFilterPart' } }
-
         if filter.has_key?('LogicalOperator')
-          message[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:ComplexFilterPart' }}
-          message['Filter'][:attributes!] = {
-            'LeftOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
-            'RightOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' }}
+          raise 'Missing SimpleFilterParts' if !filter['LeftOperand'] || !filter['RightOperand']
+          filter['LeftOperand']['@xsi:type']  = 'tns:SimpleFilterPart'
+          filter['RightOperand']['@xsi:type'] = 'tns:SimpleFilterPart'
+          filter['@xsi:type'] = 'tns:ComplexFilterPart'
+        else
+          filter['@xsi:type'] = 'tns:SimpleFilterPart'
+          message['Filter'] = filter
         end
       end
       message = {'RetrieveRequest' => message}
@@ -204,6 +208,9 @@ module FuelSDK
 
 =end
         properties = [properties] unless properties.kind_of? Array
+        properties.each do |property|
+          property['@xsi:type'] = "tns:#{object_type}"
+        end
 =begin		
         properties.each do |p|
           formated_attrs = []
@@ -219,8 +226,7 @@ module FuelSDK
 =end
 
         message = {
-          'Objects' => properties,
-          :attributes! => { 'Objects' => { 'xsi:type' => ('tns:' + object_type) } }
+          'Objects' => properties
         }
         soap_request action, message
       end
