@@ -6,7 +6,8 @@ module FuelSDK
     def continue
       rsp = nil
       if more?
-       rsp = unpack @client.soap_client.call(:retrieve, :message => {'ContinueRequest' => request_id})
+       # rsp = unpack @client.soap_client.call(:retrieve, :message => {'RetrieveRequest' => {'ContinueRequest' => request_id}})
+       rsp = SoapResponse.new(@client.soap_client.call(:retrieve, :message => {'RetrieveRequest' => {'ContinueRequest' => request_id}}), @client)
       else
         puts 'No more data'
       end
@@ -107,8 +108,8 @@ module FuelSDK
         wsse_auth: ["*", "*"],
         raise_errors: false,
         log: debug,
-        open_timeout:180,
-        read_timeout: 180
+        open_timeout: 100_000,
+        read_timeout: 100_000
       )
     end
 
