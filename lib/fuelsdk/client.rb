@@ -204,7 +204,7 @@ module FuelSDK
 			end 
 		end 
 			
-		def CreateAndStartDataExtensionImport(dataExtensionCustomerKey, fileName, overwrite)
+		def CreateAndStartDataExtensionImport(dataExtensionCustomerKey, fileName, overwrite, customerKey = nil)
 			import = ET_Import.new 
 			import.authStub = self
 			import.properties = {"Name"=> "SDK Generated Import #{DateTime.now.to_s}"}
@@ -215,7 +215,7 @@ module FuelSDK
 			import.properties["FieldMappingType"] = "InferFromColumnHeadings"
 			import.properties["FileSpec"] = fileName
 			import.properties["FileType"] = "CSV"
-			import.properties["RetrieveFileTransferLocation"] = {"CustomerKey"=>"ExactTarget Enhanced FTP"}
+			import.properties["RetrieveFileTransferLocation"] = {"CustomerKey"=> (customerKey || "ExactTarget Enhanced FTP")}
 			if overwrite then
 				import.properties["UpdateType"] = "Overwrite"
 			else 
