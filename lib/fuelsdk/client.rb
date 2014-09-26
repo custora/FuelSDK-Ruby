@@ -176,10 +176,10 @@ module FuelSDK
 					deleteresult = email.delete
 					return sendresult
 				else 
-					raise "Unable to send using send definition due to: #{result.results[0][:status_message]}"
+					raise "Unable to send using send definition due to: #{result.message}"
 				end 
 			else
-				raise "Unable to create send definition due to: #{result.results[0][:status_message]}"
+				raise "Unable to create send definition due to: #{result.message}"
 			end 
 		end
 		def CreateAndStartListImport(listId,fileName)
