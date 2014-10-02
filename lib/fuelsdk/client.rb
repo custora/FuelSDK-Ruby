@@ -170,13 +170,13 @@ module FuelSDK
 			email.properties["Email"] = {"ID"=>emailID}
 			email.authStub = self
 			result = email.post
-			if result.status then 
+			if result.status then
 				sendresult = email.send 
 				if sendresult.status then 
 					deleteresult = email.delete
 					return sendresult
 				else 
-					raise "Unable to send using send definition due to: #{result.message}"
+					raise "Unable to send using send definition due to: #{sendresult.results[0][:result][:status_message].gsub("\n", " ")}"
 				end 
 			else
 				raise "Unable to create send definition due to: #{result.message}"
