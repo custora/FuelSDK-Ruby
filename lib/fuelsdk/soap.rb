@@ -109,7 +109,9 @@ module FuelSDK
         raise_errors: false,
         log: debug,
         open_timeout: 100_000,
-        read_timeout: 100_000
+        read_timeout: 100_000,
+        ssl_version: :TLSv1,
+        ssl_ca_cert_file: '/etc/ssl/certs/ca-certificates.crt'
       )
     end
 
