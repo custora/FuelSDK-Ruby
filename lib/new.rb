@@ -158,16 +158,22 @@ module FuelSDK
           @authObj[:attributes!] = { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}
 
           myWSDL = File.read(@path + '/ExactTargetWSDL.xml')
-          @auth = Savon.client(
-            soap_header: @authObj,
-            wsdl: myWSDL,
-            endpoint: @endpoint,
-            wsse_auth: ["*", "*"],
-            raise_errors: false,
-            log: @debug,
-            open_timeout:180,
-            read_timeout: 180
-          )
+          @auth = Savon.client do
+            soap_header @authObj
+            wsdl myWSDL
+            endpoint @endpoint
+            wsse_auth ["*", "*"]
+            raise_errors false
+            log @debug
+            open_timeout 180
+            read_timeout 180
+            ssl_version :TLSv1
+            if Rails.env =~ /^prod/
+              ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
+            else
+              ssl_verify_mode :none
+            end
+          end
         else
           self.refreshToken
         end
@@ -225,14 +231,20 @@ module FuelSDK
           @authObj[:attributes!] = { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}
 
           myWSDL = File.read(@path + '/ExactTargetWSDL.xml')
-          @auth = Savon.client(
-            soap_header: @authObj,
-            wsdl: myWSDL,
-            endpoint: @endpoint,
-            wsse_auth: ["*", "*"],
-            raise_errors: false,
-            log: @debug
-          )
+          @auth = Savon.client do
+            soap_header @authObj
+            wsdl myWSDL
+            endpoint @endpoint
+            wsse_auth ["*", "*"]
+            raise_errors false
+            log @debug
+            ssl_version :TLSv1
+            if Rails.env =~ /^prod/
+              ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
+            else
+              ssl_verify_mode :none
+            end
+          end
 
         rescue Exception => e
           raise 'Unable to validate App Keys(ClientID/ClientSecret) provided: ' + e.message

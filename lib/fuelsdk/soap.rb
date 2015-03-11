@@ -101,18 +101,22 @@ module FuelSDK
 
     def soap_client
       self.refresh
-      @soap_client = Savon.client(
-        soap_header: header,
-        wsdl: wsdl,
-        endpoint: endpoint,
-        wsse_auth: ["*", "*"],
-        raise_errors: false,
-        log: debug,
-        open_timeout: 100_000,
-        read_timeout: 100_000,
-        ssl_version: :TLSv1,
-        ssl_ca_cert_file: '/etc/ssl/certs/ca-certificates.crt'
-      )
+      @soap_client = Savon.client do
+        soap_header header
+        wsdl wsdl
+        endpoint endpoint
+        wsse_auth ["*", "*"]
+        raise_errors false
+        log debug
+        open_timeout 100_000
+        read_timeout 100_000
+        ssl_version :TLSv1
+        if Rails.env =~ /^prod/
+          ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
+        else
+          ssl_verify_mode :none
+        end
+      end
     end
 
     def soap_describe object_type
@@ -122,10 +126,10 @@ module FuelSDK
             'ObjectType' => object_type
           }
         }
-      } 
+      }
       soap_request :describe, message
     end
-  
+
     def soap_perform object_type, action, properties
       message = {}
       message['Action'] = action
@@ -134,8 +138,8 @@ module FuelSDK
 
       soap_request :perform, message
     end
-    
-    
+
+
     def soap_configure  object_type, action, properties
      message = {}
      message['Action'] = action
@@ -147,7 +151,7 @@ module FuelSDK
      end
 
      message['Configurations'][:attributes!] = { 'Configuration' => { 'xsi:type' => ('tns:' + object_type) }}
-     
+
      soap_request :configure, message
     end
 
@@ -199,15 +203,15 @@ module FuelSDK
     private
 
       def soap_cud action, object_type, properties
-		
+
 =begin
         # get a list of attributes so we can seperate
         # them from standard object properties
-        type_attrs = soap_describe(object_type).editable	
+        type_attrs = soap_describe(object_type).editable
 
 =end
         properties = [properties] unless properties.kind_of? Array
-=begin		
+=begin
         properties.each do |p|
           formated_attrs = []
           p.each do |k, v|
