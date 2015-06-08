@@ -113,6 +113,7 @@ module FuelSDK
         wsse_auth ["*", "*"]
         raise_errors false
         log dbug
+        logger Logger.new('/dev/null')
         open_timeout 100_000
         read_timeout 100_000
         ssl_version :TLSv1

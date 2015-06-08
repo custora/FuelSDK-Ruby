@@ -165,6 +165,7 @@ module FuelSDK
             wsse_auth ["*", "*"]
             raise_errors false
             log @debug
+            logger Logger.new('/dev/null')
             open_timeout 180
             read_timeout 180
             ssl_version :TLSv1
@@ -238,6 +239,7 @@ module FuelSDK
             wsse_auth ["*", "*"]
             raise_errors false
             log @debug
+            logger Logger.new('/dev/null')
             ssl_version :TLSv1
             if Rails.env =~ /^prod/
               ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
