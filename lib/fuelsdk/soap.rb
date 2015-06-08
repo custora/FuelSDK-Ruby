@@ -105,14 +105,12 @@ module FuelSDK
       s_header = header
       e_point = endpoint
       wiz = wsdl
-      dbug = debug
       @soap_client = Savon.client do
         soap_header s_header
         wsdl wiz
         endpoint e_point
         wsse_auth ["*", "*"]
         raise_errors false
-        log dbug
         logger Logger.new('/dev/null')
         open_timeout 100_000
         read_timeout 100_000
