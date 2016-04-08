@@ -168,7 +168,7 @@ module FuelSDK
             open_timeout 180
             read_timeout 180
             # https://github.com/salesforce-marketingcloud/FuelSDK-Node-SOAP/issues/66
-            # ssl_version :TLSv1
+            ssl_version :TLSv1
             # if Rails.env =~ /^prod/
             #   ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
             # else
@@ -240,7 +240,7 @@ module FuelSDK
             wsse_auth ["*", "*"]
             raise_errors false
             # https://github.com/salesforce-marketingcloud/FuelSDK-Node-SOAP/issues/66
-            # ssl_version :TLSv1
+            ssl_version :TLSv1
             # if Rails.env =~ /^prod/
             #   ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
             # else
