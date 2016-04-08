@@ -167,12 +167,13 @@ module FuelSDK
             raise_errors false
             open_timeout 180
             read_timeout 180
-            ssl_version :TLSv1
-            if Rails.env =~ /^prod/
-              ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
-            else
-              ssl_verify_mode :none
-            end
+            # https://github.com/salesforce-marketingcloud/FuelSDK-Node-SOAP/issues/66
+            # ssl_version :TLSv1
+            # if Rails.env =~ /^prod/
+            #   ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
+            # else
+            ssl_verify_mode :none
+            # end
           end
         else
           self.refreshToken
@@ -238,12 +239,13 @@ module FuelSDK
             logger Logger.new('/dev/null')
             wsse_auth ["*", "*"]
             raise_errors false
-            ssl_version :TLSv1
-            if Rails.env =~ /^prod/
-              ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
-            else
-              ssl_verify_mode :none
-            end
+            # https://github.com/salesforce-marketingcloud/FuelSDK-Node-SOAP/issues/66
+            # ssl_version :TLSv1
+            # if Rails.env =~ /^prod/
+            #   ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
+            # else
+            ssl_verify_mode :none
+            # end
           end
 
         rescue Exception => e

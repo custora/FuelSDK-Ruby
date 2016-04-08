@@ -114,12 +114,13 @@ module FuelSDK
         logger Logger.new('/dev/null')
         open_timeout 100_000
         read_timeout 100_000
-        ssl_version :TLSv1
-        if Rails.env =~ /^prod/
-          ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
-        else
-          ssl_verify_mode :none
-        end
+        # https://github.com/salesforce-marketingcloud/FuelSDK-Node-SOAP/issues/66
+        # ssl_version :TLSv1
+        # if Rails.env =~ /^prod/
+        #   ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
+        # else
+        ssl_verify_mode :none
+        # end
       end
     end
 
