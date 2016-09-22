@@ -79,7 +79,7 @@ module FuelSDK
   end
 
   module Soap
-    attr_accessor :wsdl, :debug#, :internal_token
+    attr_accessor :wsdl, :debug #, :internal_token
 
     include FuelSDK::Targeting
 
@@ -99,9 +99,19 @@ module FuelSDK
       @wsdl ||= 'https://webservice.exacttarget.com/etframework.wsdl'
     end
 
-    def soap_client
-      self.refresh
+    def check_soap_client_for_refresh(window = 480)
+      if auth_token_expiration.nil? || Time.new + window > auth_token_expiration
+        self.refresh!
+        new_savon_client
+      end
+    end
 
+    def soap_client
+      check_soap_client_for_refresh(300)
+      @soap_client
+    end
+
+    def new_savon_client
       s_header = header
       e_point = endpoint
       wiz = wsdl
