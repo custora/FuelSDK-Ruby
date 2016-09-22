@@ -99,20 +99,16 @@ module FuelSDK
       @wsdl ||= 'https://webservice.exacttarget.com/etframework.wsdl'
     end
 
-    def check_soap_client_for_refresh
-      if auth_token_expiration.nil? || Time.new + 480 > self.auth_token_expiration
+    def check_soap_client_for_refresh(window = 480)
+      if auth_token_expiration.nil? || Time.new + window > self.auth_token_expiration
         self.refresh!
         new_savon_client
       end
     end
 
     def soap_client
-      if auth_token_expiration.nil? || Time.new + 300 > self.auth_token_expiration
-        self.refresh!
-        new_savon_client
-      else
-        @soap_client || new_savon_client
-      end
+      check_soap_client_for_refresh(300)
+      @soap_client || new_savon_client
     end
 
     def new_savon_client
