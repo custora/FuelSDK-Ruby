@@ -79,7 +79,7 @@ module FuelSDK
   end
 
   module Soap
-    attr_accessor :wsdl, :debug, :check_soap_client_for_refresh #, :internal_token
+    attr_accessor :wsdl, :debug #, :internal_token
 
     include FuelSDK::Targeting
 
