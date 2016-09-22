@@ -100,7 +100,7 @@ module FuelSDK
     end
 
     def check_soap_client_for_refresh(window = 480)
-      if auth_token_expiration.nil? || Time.new + window > self.auth_token_expiration
+      if auth_token_expiration.nil? || Time.new + window > auth_token_expiration
         self.refresh!
         new_savon_client
       end
@@ -108,7 +108,7 @@ module FuelSDK
 
     def soap_client
       check_soap_client_for_refresh(300)
-      @soap_client || new_savon_client
+      @soap_client
     end
 
     def new_savon_client
