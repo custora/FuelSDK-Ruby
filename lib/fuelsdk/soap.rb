@@ -103,9 +103,6 @@ module FuelSDK
       if auth_token_expiration.nil? || Time.new + 480 > self.auth_token_expiration
         self.refresh!
         new_savon_client
-        true
-      else
-        false
       end
     end
 
