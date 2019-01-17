@@ -194,8 +194,8 @@ module FuelSDK
         if filter.has_key?('LogicalOperator')
           message[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:ComplexFilterPart' }}
           message['Filter'][:attributes!] = {
-            'LeftOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
-            'RightOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' }}
+            'LeftOperand' => { 'xsi:type' => filter_type(filter['LeftOperand']) },
+            'RightOperand' => { 'xsi:type' => filter_type(filter['RightOperand']) }}
         end
       end
       message = {'RetrieveRequest' => message}
@@ -216,6 +216,10 @@ module FuelSDK
     end
 
     private
+
+    def filter_type(filter)
+      filter.has_key?('LogicalOperator') ? 'tns:ComplexFilterPart' : 'tns:SimpleFilterPart'
+    end
 
       def soap_cud action, object_type, properties
 
