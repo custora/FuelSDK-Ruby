@@ -111,8 +111,8 @@ begin
 		p '>>> Delete Folder'
 		deleteFolder = FuelSDK::Folder.new
 		deleteFolder.authStub = stubObj
-		deleteFolder.props = {"CustomerKey" => NameOfTestFolder, "Name"=>NameOfTestFolder, "Content"=> "<b>Some HTML Content Goes here. NOW WITH NEW CONTENT</b>"}
-		deleteResponse = deleteFolder.delete
+		deleteFolder.props = {"Name"=>"Custora API"};
+		deleteResponse = deleteFolder.delete;
 		p 'Delete Status: ' + deleteResponse.status.to_s
 		p 'Code: ' + deleteResponse.code.to_s
 		p 'Message: ' + deleteResponse.message.to_s
@@ -140,4 +140,3 @@ rescue => e
 	p "Caught exception: #{e.message}"
 	p e.backtrace
 end
-

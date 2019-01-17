@@ -516,7 +516,11 @@ module FuelSDK
         if filter.has_key?('LogicalOperator') then
           obj['Filter'] = filter
           obj[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:ComplexFilterPart' }}
-          obj['Filter'][:attributes!] = { 'LeftOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' }, 'RightOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' }}
+
+          obj['Filter'][:attributes!] = {
+            'LeftOperand' => { 'xsi:type' => filter_type(filter['LeftOperand']) },
+            'RightOperand' => { 'xsi:type' => filter_type(filter['RightOperand']) },
+          }
         else
           obj['Filter'] = filter
           obj[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:SimpleFilterPart' } }
@@ -549,6 +553,13 @@ module FuelSDK
         # Store the Last Request ID for use with continue
         @request_id = @@body[:retrieve_response_msg][:request_id]
       end
+    end
+
+    private
+
+    # Returns if a filter is a tns:SimpleFilterPart or a tns:ComplexFilterPart
+    def filter_type(filter)
+      filter.has_key?('LogicalOperator') ? 'tns:ComplexFilterPart' : 'tns:SimpleFilterPart'
     end
   end
 
