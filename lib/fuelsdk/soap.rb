@@ -193,9 +193,26 @@ module FuelSDK
 
         if filter.has_key?('LogicalOperator')
           message[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:ComplexFilterPart' }}
+          left_operand_type = filter_type(filter['LeftOperand'])
+          right_operand_type = filter_type(filter['RightOperand'])
           message['Filter'][:attributes!] = {
-            'LeftOperand' => { 'xsi:type' => filter_type(filter['LeftOperand']) },
-            'RightOperand' => { 'xsi:type' => filter_type(filter['RightOperand']) }}
+            'LeftOperand' => { 'xsi:type' => left_operand_type },
+            'RightOperand' => { 'xsi:type' => right_operand_type },
+          }
+
+          if left_operand_type == "tns:ComplexFilterPart"
+            message['Filter']['LeftOperand'][:attributes!] = {
+              'LeftOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
+              'RightOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
+            }
+          end
+
+          if right_operand_type == "tns:ComplexFilterPart"
+            message['Filter']['RightOperand'][:attributes!] = {
+              'LeftOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
+              'RightOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
+            }
+          end
         end
       end
       message = {'RetrieveRequest' => message}
