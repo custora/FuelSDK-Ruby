@@ -40,7 +40,7 @@ module FuelSDK
 
 	class Client
 	attr_accessor :debug, :access_token, :auth_token, :internal_token, :refresh_token,
-		:id, :secret, :signature, :package_name, :package_folders, :parent_folders, :auth_token_expiration, :mailer
+		:id, :secret, :v2_auth_subdomain, :signature, :package_name, :package_folders, :parent_folders, :auth_token_expiration, :mailer
 
 	include FuelSDK::Soap
 	include FuelSDK::Rest
