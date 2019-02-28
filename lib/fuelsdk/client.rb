@@ -60,9 +60,10 @@ module FuelSDK
 			self.debug = debug
 			client_config = params['client']
 			if client_config
-			self.id = client_config["id"]
-			self.secret = client_config["secret"]
-			self.signature = client_config["signature"]
+				self.id = client_config["id"]
+				self.secret = client_config["secret"]
+				self.signature = client_config["signature"]
+				self.v2_auth_subdomain = client_config["subdomain"]
 			end
 
 			self.mailer = params['mailer'] if params['mailer']
@@ -75,34 +76,49 @@ module FuelSDK
 
 		def refresh force=false
 			raise 'Require Client Id and Client Secret to refresh tokens' unless (id && secret)
-			#If we don't already have a token or the token expires within 5 min(300 seconds)
+			use_v2_auth = self.v2_auth_subdomain.present?
+			# If we don't already have a token or the token expires within 5 min(300 seconds)
 			if (self.access_token.nil? || Time.new + 300 > self.auth_token_expiration || force) then
-			payload = Hash.new.tap do |h|
-				h['clientId']= id
-				h['clientSecret'] = secret
-				h['refreshToken'] = refresh_token if refresh_token
-				h['accessType'] = 'offline'
-			end
+				if use_v2_auth
+					options = {
+						'data' => {
+							'client_id' => id,
+							'client_secret' => secret,
+							'grant_type' => 'client_credentials',
+						},
+						'content_type' => 'application/json',
+					}
+					response = post("https://#{self.v2_auth_subdomain}.auth.marketingcloudapis.com/v2/token", options)
+					raise "Unable to refresh token: #{response.message}" unless response.has_key?('access_token')
+					self.access_token = response['access_token']
+					self.auth_token_expiration = Time.new + response['expires_in']
+				else
+					payload = Hash.new.tap do |h|
+						h['clientId']= id
+						h['clientSecret'] = secret
+						h['refreshToken'] = refresh_token if refresh_token
+						h['accessType'] = 'offline'
+					end
 
-			options = Hash.new.tap do |h|
-				h['data'] = payload
-				h['content_type'] = 'application/json'
-				h['params'] = {'legacy' => 1}
-			end
-			response = post("https://auth.exacttargetapis.com/v1/requestToken", options)
-			raise "Unable to refresh token: #{response['message']}" unless response.has_key?('accessToken')
-
-			self.access_token = response['accessToken']
-			self.internal_token = response['legacyToken']
-			self.auth_token_expiration = Time.new + response['expiresIn']
-			self.refresh_token = response['refreshToken'] if response.has_key?("refreshToken")
-			if self.mailer
-				self.mailer.refresh_token = self.refresh_token
-				self.mailer.save
-			end
-			return true
-			else 
-			return false
+					options = Hash.new.tap do |h|
+						h['data'] = payload
+						h['content_type'] = 'application/json'
+						h['params'] = {'legacy' => 1}
+					end
+					response = post("https://auth.exacttargetapis.com/v1/requestToken", options)
+					raise "Unable to refresh token: #{response['message']}" unless response.has_key?('accessToken')
+					self.access_token = response['accessToken']
+					self.internal_token = response['legacyToken']
+					self.auth_token_expiration = Time.new + response['expiresIn']
+					self.refresh_token = response['refreshToken'] if response.has_key?("refreshToken")
+					if self.mailer
+						self.mailer.refresh_token = self.refresh_token
+						self.mailer.save
+					end
+				end
+				true
+			else
+				false
 			end
 		end
 
