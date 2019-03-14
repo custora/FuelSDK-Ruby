@@ -127,24 +127,31 @@ module FuelSDK
         endpoint
       end
       wiz = wsdl
-      @soap_client = Savon.client do
-        soap_header s_header
-        wsdl wiz
-        endpoint e_point
-        unless self.v2_auth_subdomain.present?
-          wsse_auth ["*", "*"]
+      @soap_client = if self.v2_auth_subdomain.present?
+        Savon.client do
+          soap_header s_header
+          wsdl wiz
+          endpoint e_point
+          raise_errors false
+          logger Logger.new('/dev/null')
+          open_timeout 100_000
+          read_timeout 100_000
+          ssl_version :TLSv1_2
+          ssl_verify_mode :none
         end
-        raise_errors false
-        logger Logger.new('/dev/null')
-        open_timeout 100_000
-        read_timeout 100_000
-        ssl_version :TLSv1_2
-        # https://github.com/salesforce-marketingcloud/FuelSDK-Node-SOAP/issues/66
-        # if Rails.env =~ /^prod/
-        #   ssl_ca_cert_file '/etc/ssl/certs/ca-certificates.crt'
-        # else
-        ssl_verify_mode :none
-        # end
+      else
+        Savon.client do
+          soap_header s_header
+          wsdl wiz
+          endpoint e_point
+          wsse_auth ["*", "*"]
+          raise_errors false
+          logger Logger.new('/dev/null')
+          open_timeout 100_000
+          read_timeout 100_000
+          ssl_version :TLSv1_2
+          ssl_verify_mode :none
+        end
       end
     end
 
