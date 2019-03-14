@@ -131,7 +131,9 @@ module FuelSDK
         soap_header s_header
         wsdl wiz
         endpoint e_point
-        wsse_auth ["*", "*"] unless self.v2_auth_subdomain.present?
+        unless self.v2_auth_subdomain.present?
+          wsse_auth ["*", "*"]
+        end
         raise_errors false
         logger Logger.new('/dev/null')
         open_timeout 100_000
