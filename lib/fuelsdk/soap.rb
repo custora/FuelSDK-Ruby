@@ -101,7 +101,7 @@ module FuelSDK
 
     def wsdl
       @wsdl ||= if self.v2_auth_subdomain.present?
-        'https://#{self.v2_auth_subdomain}.soap.marketingcloudapis.com/etframework.wsdl'
+        "https://#{self.v2_auth_subdomain}.soap.marketingcloudapis.com/etframework.wsdl"
       else
         'https://webservice.exacttarget.com/etframework.wsdl'
       end
