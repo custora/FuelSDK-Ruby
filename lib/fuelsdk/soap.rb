@@ -84,11 +84,15 @@ module FuelSDK
     include FuelSDK::Targeting
 
     def header
-      raise 'Require legacy token for soap header' unless internal_token
-      {
-        'oAuth' => {'oAuthToken' => internal_token},
-        :attributes! => { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}
-      }
+      if self.v2_auth_subdomain.present?
+        { 'fueloauth' => self.access_token }
+      else
+        raise 'Require legacy token for soap header' unless internal_token
+        {
+          'oAuth' => {'oAuthToken' => internal_token},
+          :attributes! => { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}
+        }
+      end
     end
 
     def debug
@@ -96,7 +100,11 @@ module FuelSDK
     end
 
     def wsdl
-      @wsdl ||= 'https://webservice.exacttarget.com/etframework.wsdl'
+      @wsdl ||= if self.v2_auth_subdomain.present?
+        'https://#{self.v2_auth_subdomain}.soap.marketingcloudapis.com/etframework.wsdl'
+      else
+        'https://webservice.exacttarget.com/etframework.wsdl'
+      end
     end
 
     def check_soap_client_for_refresh(window = 480)
@@ -113,13 +121,17 @@ module FuelSDK
 
     def new_savon_client
       s_header = header
-      e_point = endpoint
+      e_point = if self.v2_auth_subdomain.present?
+        "https://#{self.v2_auth_subdomain}.soap.marketingcloudapis.com/Service.asmx"
+      else
+        endpoint
+      end
       wiz = wsdl
       @soap_client = Savon.client do
         soap_header s_header
         wsdl wiz
         endpoint e_point
-        wsse_auth ["*", "*"]
+        wsse_auth ["*", "*"] unless self.v2_auth_subdomain.present?
         raise_errors false
         logger Logger.new('/dev/null')
         open_timeout 100_000
